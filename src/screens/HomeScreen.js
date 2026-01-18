@@ -28,7 +28,15 @@ export default function HomeScreen({ navigation }) {
         title="View Detailed Network Info"
         onPress={() => navigation.navigate("NetworkDetails")}
       />
+      <Button
+        title="View Connected Devices"
+        onPress={() => navigation.navigate("Devices")}
+      />
+
+      
     </View>
+
+    
   );
 }
 

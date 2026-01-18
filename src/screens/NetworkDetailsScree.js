@@ -73,7 +73,7 @@ export default function NetworkDetailsScreen() {
   // 🔹 Send to backend when all data is ready
   useEffect(()=>{
     checkPing();
-     const interval = setInterval(checkPing, 100);
+     const interval = setInterval(checkPing, 1000);
      return () => clearInterval(interval);
   },[])
   useEffect(() => {
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   card: {
-    backgroundColor: "#1e293b",
+    backgroundColor: "#f9f9f9",
     padding: 15,
     borderRadius: 10,
   },
