@@ -33,6 +33,11 @@ export default function HomeScreen({ navigation }) {
         onPress={() => navigation.navigate("Devices")}
       />
 
+      <Button
+        title="View User Profile"
+        onPress={() => navigation.navigate("UserProfile")}
+      />
+
       
     </View>
 

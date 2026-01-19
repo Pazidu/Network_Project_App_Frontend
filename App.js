@@ -6,13 +6,16 @@
  */
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginScreen from '../Network_Project_App_Frontend/src/screens/Auth/LoginScreen.js';
-import SignupScreen from '../Network_Project_App_Frontend/src/screens/Auth/SignupScreen.js';
+import LoginScreen from './src/screens/Auth/LoginScreen.js';
+import SignupScreen from './src/screens/Auth/SignupScreen.js';
 import { NavigationContainer } from '@react-navigation/native';
 import { enableScreens } from 'react-native-screens';
 import HomeScreen from './src/screens/HomeScreen.js';
 import NetworkDetailsScreen from './src/screens/NetworkDetailsScree.js';
 import ConnectedDevicesScreen from './src/screens/ConnectedDevicesScreen.js';
+import UserProfileScreen from './src/screens/User/UserProfile.js';
+import VerificationScreen from './src/screens/User/VerificationScreen.js';
+import EditProfileScreen from './src/screens/User/EditProfileScreen.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +29,9 @@ function App() {
         <Stack.Screen name='Home' component={HomeScreen}/>
         <Stack.Screen name='NetworkDetails' component={NetworkDetailsScreen}/>
         <Stack.Screen name='Devices' component={ConnectedDevicesScreen}/>
+        <Stack.Screen name='UserProfile' component={UserProfileScreen}/>
+        <Stack.Screen name='Verification' component={VerificationScreen}/>
+        <Stack.Screen name='EditProfile' component={EditProfileScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
