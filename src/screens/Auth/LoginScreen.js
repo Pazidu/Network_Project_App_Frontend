@@ -32,6 +32,7 @@ const LoginScreen = ({ navigation }) => {
         if(loginResponse.status == 200){
             await AsyncStorage.setItem('token', loginResponse.data.token)
             Alert.alert('Authenticated Successfully', `Connected to server as ${email}...`)
+            navigation.replace('Home');
         }
         
     }catch(error){
