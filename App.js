@@ -6,8 +6,8 @@
  */
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginScreen from '../Network_Project_App_Frontend/src/screens/Auth/LoginScreen.js';
-import SignupScreen from '../Network_Project_App_Frontend/src/screens/Auth/SignupScreen.js';
+import LoginScreen from './src/screens/Auth/LoginScreen.js';
+import SignupScreen from './src/screens/Auth/SignupScreen.js';
 import { NavigationContainer } from '@react-navigation/native';
 import { enableScreens } from 'react-native-screens';
 import HomeScreen from './src/screens/HomeScreen.js';

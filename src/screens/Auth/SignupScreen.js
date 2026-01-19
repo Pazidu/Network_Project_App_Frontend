@@ -46,6 +46,7 @@ const SignupScreen = ({ navigation }) => {
         }
 
     }catch(error){
+       console.log(error)
         Alert.alert(error.response?.data?.message || 'Something went wrong!')
     }
     

@@ -58,24 +58,24 @@ export default function NetworkDetailsScreen() {
   };
 
   // 🔹 Ping test
-  const checkPing = async () => {
-    try {
-      const start = Date.now();
-      await fetch("https://www.google.com"); // You can use any reliable server
-      const end = Date.now();
-      setPing(end - start); // in milliseconds
-    } catch (error) {
-      console.error("Ping failed:", error);
-      setPing(null);
-    }
-  };
+ const checkPing = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/ping`);
+    const data = await res.json();
+    setPing(data.ping);
+  } catch (e) {
+    console.error("Ping error", e);
+    setPing(null);
+  }
+};
 
-  // 🔹 Send to backend when all data is ready
-  useEffect(()=>{
-    checkPing();
-     const interval = setInterval(checkPing, 1000);
-     return () => clearInterval(interval);
-  },[])
+
+  useEffect(() => {
+  checkPing();
+  const interval = setInterval(checkPing, 1000);
+  return () => clearInterval(interval);
+}, []);
+
   useEffect(() => {
     if (info.ip && ping && speed) {
       sendNetworkData({
@@ -92,6 +92,7 @@ export default function NetworkDetailsScreen() {
   useEffect(() => {
     loadNetworkInfo();
   }, []);
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

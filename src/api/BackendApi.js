@@ -1,15 +1,19 @@
-import axios from 'axios';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+import axios from "axios";
+import { API_BASE_URL } from "@env";
 
 const BackendApi = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 5000,
+  timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
+
+
+
 
 BackendApi.interceptors.request.use(
   async (config) => {

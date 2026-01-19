@@ -32,7 +32,7 @@ export default function ConnectedDevicesScreen() {
   useEffect(() => {
     fetchDevices();
 
-    const interval = setInterval(fetchDevices, 10000); // auto refresh every 10s
+    const interval = setInterval(fetchDevices, 10000); 
     return () => clearInterval(interval);
   }, []);
 
