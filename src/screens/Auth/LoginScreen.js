@@ -36,6 +36,8 @@ const LoginScreen = ({ navigation }) => {
         }
         
     }catch(error){
+      console.log(error);
+      
         Alert.alert(error?.response?.data?.detail || "Something went wrong","Try Again....")
     }
   };

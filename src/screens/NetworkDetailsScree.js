@@ -59,34 +59,42 @@ export default function NetworkDetailsScreen() {
 
  const checkPing = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/ping`);
+    const res = await fetch(`${API_BASE_URL}/ping/`, {
+      headers: { "Accept": "application/json" },
+    });
+
+    if (!res.ok) throw new Error("Ping failed");
+
     const data = await res.json();
     setPing(data.ping);
   } catch (e) {
-    console.error("Ping error", e);
+    console.error("Ping error:", e.message);
     setPing(null);
   }
 };
 
 
+
   useEffect(() => {
   checkPing();
-  const interval = setInterval(checkPing, 1000);
+  const interval = setInterval(checkPing, 5000);
   return () => clearInterval(interval);
 }, []);
 
+
   useEffect(() => {
-    if (info.ip && ping && speed) {
-      sendNetworkData({
-        device_id: DEVICE_ID,
-        ip: info.ip,
-        gateway: info.gateway,
-        ssid: info.ssid,
-        ping,
-        speed_mbps: parseFloat(speed),
-      });
-    }
-  }, [info, ping, speed]);
+  if (info.ip && ping !== null && speed !== null) {
+    sendNetworkData({
+      device_id: DEVICE_ID,
+      ip: info.ip,
+      gateway: info.gateway,
+      ssid: info.ssid,
+      ping,
+      speed_mbps: parseFloat(speed),
+    });
+  }
+}, [info, ping, speed]);
+
 
   useEffect(() => {
     loadNetworkInfo();
