@@ -7,7 +7,7 @@ export default function WifiScreen() {
 
   const fetchWifi = async () => {
     try {
-      const res = await BackendApi.get('network/wifi');
+      const res = await BackendApi.get('/network/wifi');
       console.log("Wifi response:",res.data)
       //const data = await res.json();
       setWifi(res.data);
