@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Button, ScrollView } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import { NetworkInfo } from "react-native-network-info";
 import { API_BASE_URL, DEVICE_ID } from "@env";
+import BackendApi from "../api/BackendApi";
 
 export default function NetworkDetailsScreen() {
   const [info, setInfo] = useState({});
@@ -13,13 +14,17 @@ export default function NetworkDetailsScreen() {
  
   const sendNetworkData = async (payload) => {
     try {
-      await fetch(`${API_BASE_URL}/network`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // await fetch(`${API_BASE_URL}/network/wifi`, {
+      //   method: "GET",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(payload),
+      // });
+      const networkDetailsResponse = await BackendApi.get('/network/wifi')
+      console.log("Network Details Response:", networkDetailsResponse.data);
       console.log("Network data sent to backend");
     } catch (err) {
+      console.log(err);
+      
       console.error("Failed to send network data:", err);
     }
   };
