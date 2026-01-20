@@ -19,6 +19,7 @@ import WifiScreen from './src/screens/wifiscreen.js';
 import UserProfileScreen from './src/screens/User/UserProfile.js';
 import VerificationScreen from './src/screens/User/VerificationScreen.js';
 import EditProfileScreen from './src/screens/User/EditProfileScreen.js';
+import NewPasswordScreen from './src/screens/User/NewPasswordScreen.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -39,6 +40,8 @@ function App() {
         <Stack.Screen name='UserProfile' component={UserProfileScreen}/>
         <Stack.Screen name='Verification' component={VerificationScreen}/>
         <Stack.Screen name='EditProfile' component={EditProfileScreen}/>
+        <Stack.Screen name='changePassword' component={NewPasswordScreen}/>
+
 
       </Stack.Navigator>
     </NavigationContainer>

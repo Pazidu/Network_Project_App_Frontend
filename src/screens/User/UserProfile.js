@@ -90,7 +90,6 @@ const UserProfile = ({ navigation}) => {
             </View>
           </View>
 
-          {/* Email Row */}
           <View style={styles.infoCard}>
             <View style={styles.iconContainer}>
               <Text style={styles.icon}>✉️</Text>
@@ -103,7 +102,7 @@ const UserProfile = ({ navigation}) => {
 
           <TouchableOpacity 
             style={styles.securityActionCard} 
-            onPress={() => navigation.navigate('Verification')}
+            onPress={() => navigation.navigate('Verification', { email: userData.email })}
             activeOpacity={0.7}
             >
             <View style={styles.iconContainer}>
@@ -116,7 +115,6 @@ const UserProfile = ({ navigation}) => {
             <Text style={styles.arrowIcon}>→</Text>
         </TouchableOpacity>
         </View>
-        {/* Actions Section */}
         <View style={styles.actionSection}>
           <TouchableOpacity 
             style={styles.editBtn} 

@@ -39,7 +39,7 @@ const EditProfileScreen = ({ route, navigation }) => {
             'Profile Updated',
             'Your details have been saved successfully.',
             [
-                { text: 'OK', onPress: () => navigation.goBack() } // Navigate back to Profile on success
+                { text: 'OK', onPress: () => navigation.goBack() }
             ]
         );
 

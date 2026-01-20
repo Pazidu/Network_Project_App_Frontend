@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,11 +8,45 @@ import {
   SafeAreaView,
   StatusBar,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
+import BackendApi from '../../api/BackendApi';
 
-const VerificationScreen = () => {
+const VerificationScreen = ({ route, navigation }) => {
   const [code, setCode] = useState('');
+  const { email } = route.params;
+
+  useEffect(() => {
+    sendVerificationCode();
+  }, [])
+
+  const sendVerificationCode = async () => {
+    try{
+
+      const verificationCodeSentResponse = await BackendApi.post('/user/send-verification-code', {
+          email: email
+      })
+      
+      Alert.alert(verificationCodeSentResponse.data.message);
+    }catch(error){
+      Alert.alert('Error', 'Failed to send verification code.');
+    }
+  }
+
+  const verifyCode = async () => {
+    try{
+      const verifyCodeResponse = await BackendApi.post('/user/verify-verification-code', {
+        email: email,
+        code: code
+      })
+
+      navigation.navigate('changePassword', { email: email})
+      
+    }catch(error){
+      Alert.alert('Error', 'Failed to verify code.');
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -24,7 +58,7 @@ const VerificationScreen = () => {
           <Text style={styles.title}>Check your Email</Text>
           <Text style={styles.subtitle}>
             We sent a verification code to {"\n"}
-            <Text style={styles.emailHighlight}>admin@network.local</Text>
+            <Text style={styles.emailHighlight}>{ email }</Text>
           </Text>
 
           <View style={styles.inputContainer}>
@@ -40,12 +74,12 @@ const VerificationScreen = () => {
             />
           </View>
 
-          <TouchableOpacity style={styles.verifyBtn}>
+          <TouchableOpacity style={styles.verifyBtn} onPress={() => {verifyCode()}}>
             <Text style={styles.verifyBtnText}>VERIFY CODE</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.resendContainer}>
-            <Text style={styles.resendText}>Didn't receive it? <Text style={styles.resendLink}>Resend</Text></Text>
+            <Text style={styles.resendText}>Didn't receive it? <Text style={styles.resendLink} onPress={() => {sendVerificationCode()}}>Resend</Text></Text>
           </TouchableOpacity>
 
         </View>
