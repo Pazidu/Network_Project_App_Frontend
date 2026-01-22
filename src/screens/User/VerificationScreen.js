@@ -31,6 +31,7 @@ const VerificationScreen = ({ route, navigation }) => {
       Alert.alert(verificationCodeSentResponse.data.message);
     }catch(error){
       Alert.alert('Error', 'Failed to send verification code.');
+      navigation.goBack();
     }
   }
 

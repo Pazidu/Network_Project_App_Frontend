@@ -45,6 +45,25 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  const handleResetPassword = () => {
+    Alert.prompt(
+    "Enter Name",
+    "Please enter your name:",
+    [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel"
+      },
+      {
+        text: "OK",
+        onPress: email => navigation.navigate('Verification', { email: email })
+      }
+    ],
+    "plain-text"
+  );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
@@ -88,7 +107,7 @@ const LoginScreen = ({ navigation }) => {
             </View>
 
             <TouchableOpacity style={styles.forgotBtn}>
-              <Text style={styles.forgotText}>Forgot Password?</Text>
+              <Text style={styles.forgotText} onPress={() => handleResetPassword()}>Forgot Password?</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
