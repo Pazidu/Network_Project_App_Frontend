@@ -180,6 +180,17 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.cardTitle}>About Wi-Fi</Text>
             <Text style={styles.cardSubtitle}>Hardware Info</Text>
           </TouchableOpacity>
+          <TouchableOpacity 
+              style={styles.card} 
+              onPress={() => navigation.navigate("DeviceHistory")}
+            >
+              <View style={[styles.iconBox, { backgroundColor: "rgba(236, 72, 153, 0.2)" }]}>
+                <MaterialCommunityIcons name="history" size={28} color="#ec4899" />
+              </View>
+              <Text style={styles.cardTitle}>Device History</Text>
+              <Text style={styles.cardSubtitle}>Last 30 Days</Text>
+            </TouchableOpacity>
+
 
           <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("UserProfile")}>
             <View style={[styles.iconBox, { backgroundColor: "rgba(139, 92, 246, 0.2)" }]}>
