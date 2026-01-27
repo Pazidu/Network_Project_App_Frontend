@@ -27,6 +27,7 @@ export default function HomeScreen({ navigation }) {
   const [wifiData, setWifiData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [network, setNetwork] = useState(null);
 
   // --- 2. FETCH DATA FROM BACKEND ---
   const fetchWifiInfo = async () => {
@@ -186,49 +187,47 @@ export default function HomeScreen({ navigation }) {
               </Text>
             </View>
           </View>
+        </TouchableOpacity>
+        {/* DISPLAY THE SMART SSID */}
+        <Text style={styles.statusTitle}>{getSSID()}</Text>
 
-          {/* DISPLAY THE SMART SSID */}
-          <Text style={styles.statusTitle}>{getSSID()}</Text>
-
-          <View style={styles.statusRow}>
-            <View style={styles.statusItem}>
-              <Text style={styles.statusLabel}>Type</Text>
-              <Text style={styles.statusValue}>
-                {network?.type?.toUpperCase() || '--'}
-              </Text>
-            </View>
-            <View style={styles.statusItem}>
-              <Text style={styles.statusLabel}>Internet</Text>
-              <Text style={styles.statusValue}>
-                {network?.isInternetReachable ? 'Reachable' : 'Unreachable'}
-              </Text>
-            </View>
+        <View style={styles.statusRow}>
+          <View style={styles.statusItem}>
+            <Text style={styles.statusLabel}>Type</Text>
+            <Text style={styles.statusValue}>
+              {network?.type?.toUpperCase() || '--'}
+            </Text>
           </View>
-
-          <View style={{ alignItems: 'center' }}>
-            {/* TIP: Click to open Location Settings if needed */}
-            {getSSID() === 'Unknown (Turn On GPS)' && (
-              <TouchableOpacity
-                style={{
-                  marginTop: 15,
-                  backgroundColor: 'rgba(0,0,0,0.2)',
-                  padding: 10,
-                  borderRadius: 8,
-                  alignItems: 'center',
-                }}
-                onPress={() =>
-                  Linking.sendIntent(
-                    'android.settings.LOCATION_SOURCE_SETTINGS',
-                  )
-                }
-              >
-                <Text style={{ color: '#fff', fontSize: 12 }}>
-                  Tap to Open Location Settings
-                </Text>
-              </TouchableOpacity>
-            )}
+          <View style={styles.statusItem}>
+            <Text style={styles.statusLabel}>Internet</Text>
+            <Text style={styles.statusValue}>
+              {network?.isInternetReachable ? 'Reachable' : 'Unreachable'}
+            </Text>
           </View>
+        </View>
+        <View>
+          {/* TIP: Click to open Location Settings if needed */}
+          {getSSID() === 'Unknown (Turn On GPS)' && (
+            <TouchableOpacity
+              style={{
+                marginTop: 15,
+                backgroundColor: 'rgba(0,0,0,0.2)',
+                padding: 10,
+                borderRadius: 8,
+                alignItems: 'center',
+              }}
+              onPress={() =>
+                Linking.sendIntent('android.settings.LOCATION_SOURCE_SETTINGS')
+              }
+            >
+              <Text style={{ color: '#fff', fontSize: 12 }}>
+                Tap to Open Location Settings
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
+        <TouchableOpacity>
           {/* DISPLAY THE SSID FROM PYTHON BACKEND */}
           <Text style={styles.statusTitle} numberOfLines={1}>
             {getSSID()}
@@ -258,9 +257,9 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.cardSubtitle}>Full Analytics</Text>
           </TouchableOpacity>
 
-          {/* <TouchableOpacity
+          <TouchableOpacity
             style={styles.card}
-            onPress={() => navigation.navigate('Devices')}
+            onPress={() => navigation.navigate('NetworkUsage')}
           >
             <View
               style={[
@@ -276,7 +275,7 @@ export default function HomeScreen({ navigation }) {
             </View>
             <Text style={styles.cardTitle}>Devices</Text>
             <Text style={styles.cardSubtitle}>Scan Network</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.card}
@@ -317,7 +316,7 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.cardSubtitle}>Last 30 Days</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.card}
             onPress={() => navigation.navigate('NetworkUsage')}
           >
@@ -335,7 +334,7 @@ export default function HomeScreen({ navigation }) {
             </View>
             <Text style={styles.cardTitle}>Devices</Text>
             <Text style={styles.cardSubtitle}>Devices & Usage</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             style={styles.card}
@@ -501,11 +500,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 4,
-  },
-
-  cardSubtitle: {
-    fontSize: 12,
-    color: '#94a3b8',
   },
 
   cardSubtitle: {
