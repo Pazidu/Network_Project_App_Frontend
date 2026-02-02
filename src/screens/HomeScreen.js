@@ -1,5 +1,5 @@
+import React, { useEffect, useState, useCallback } from 'react';
 
-import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -16,8 +16,10 @@ import {
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import BackendApi from '../api/BackendApi';
 
+// Added for potential profile image
+
+import BackendApi from '../api/BackendApi'; // <--- 1. IMPORT YOUR API
 
 const { width } = Dimensions.get('window');
 
@@ -34,7 +36,7 @@ export default function HomeScreen({ navigation }) {
       // res.data contains { ssid: "Name", ip: "...", etc }
       setWifiData(res.data);
     } catch (err) {
-      console.log("Error fetching Home SSID:", err);
+      console.log('Error fetching Home SSID:', err);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -131,25 +133,28 @@ const onRefresh = useCallback(async () => {
         </TouchableOpacity>
       </View>
 
-
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#3b82f6"/>
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#3b82f6"
+          />
         }
       >
-        
-
         {/* MAIN STATUS CARD */}
-        <TouchableOpacity 
-          activeOpacity={0.9} 
+        <TouchableOpacity
+          activeOpacity={0.9}
           onPress={fetchWifiInfo} // Tap card to refresh
           style={[styles.statusCard, { backgroundColor: getStatusColor() }]}
         >
           <View style={styles.statusHeader}>
             <MaterialCommunityIcons name="wifi" size={32} color="#fff" />
             <View style={styles.badge}>
-              <Text style={[styles.badgeText, { color: getStatusColor() }]}>{getStatusText()}</Text>
+              <Text style={[styles.badgeText, { color: getStatusColor() }]}>
+                {getStatusText()}
+              </Text>
             </View>
           </View>
 
@@ -171,6 +176,13 @@ const onRefresh = useCallback(async () => {
               </Text>
             </View>
           </View>
+          <View style={styles.statusItem}>
+            <Text style={styles.statusLabel}>Internet</Text>
+            <Text style={styles.statusValue}>
+              {network?.isInternetReachable ? 'Reachable' : 'Unreachable'}
+            </Text>
+          </View>
+        </View>
         <View>
           {/* TIP: Click to open Location Settings if needed */}
           {/* {getSSID() === 'Unknown (Turn On GPS)' && (
@@ -200,7 +212,6 @@ const onRefresh = useCallback(async () => {
           </Text>
           
         </TouchableOpacity> 
-
 
         <Text style={styles.sectionTitle}>Quick Actions</Text>
 
@@ -264,17 +275,25 @@ const onRefresh = useCallback(async () => {
             <Text style={styles.cardTitle}>About Wi-Fi</Text>
             <Text style={styles.cardSubtitle}>Hardware Info</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-              style={styles.card} 
-              onPress={() => navigation.navigate("DeviceHistory")}
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('DeviceHistory')}
+          >
+            <View
+              style={[
+                styles.iconBox,
+                { backgroundColor: 'rgba(236, 72, 153, 0.2)' },
+              ]}
             >
-              <View style={[styles.iconBox, { backgroundColor: "rgba(236, 72, 153, 0.2)" }]}>
-                <MaterialCommunityIcons name="history" size={28} color="#ec4899" />
-              </View>
-              <Text style={styles.cardTitle}>Device History</Text>
-              <Text style={styles.cardSubtitle}>Last 30 Days</Text>
-            </TouchableOpacity>
-
+              <MaterialCommunityIcons
+                name="history"
+                size={28}
+                color="#ec4899"
+              />
+            </View>
+            <Text style={styles.cardTitle}>Device History</Text>
+            <Text style={styles.cardSubtitle}>Last 30 Days</Text>
+          </TouchableOpacity>
 
           {/* <TouchableOpacity
             style={styles.card}
@@ -322,7 +341,6 @@ const onRefresh = useCallback(async () => {
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#0f172a',
@@ -464,10 +482,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 
-  
-  cardSubtitle: { 
-    fontSize: 12, 
-    color: "#94a3b8" 
+  cardSubtitle: {
+    fontSize: 12,
+    color: '#94a3b8',
   },
 });
-
