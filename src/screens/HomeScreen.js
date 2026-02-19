@@ -1,37 +1,26 @@
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  StatusBar,
+  Dimensions,
+  RefreshControl,
+  Image,
+  PermissionsAndroid,
+  Platform,
+  Linking,   
+} from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import BackendApi from '../api/BackendApi';
+import notifee, { AndroidImportance } from '@notifee/react-native';
+import Modal from 'react-native-modal';
+const { width } = Dimensions.get('window');
 
-
-  import React, { useEffect, useState, useCallback } from "react";
-  import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-    StatusBar,
-    Dimensions,
-    RefreshControl,
-    Image,
-    PermissionsAndroid,
-    Platform,
-    Linking,
-    
-  } from 'react-native';
-  import NetInfo from '@react-native-community/netinfo';
-  import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-  import BackendApi from '../api/BackendApi';
-  import notifee, { AndroidImportance } from '@notifee/react-native';
-  import Modal from 'react-native-modal';
-
-
-
-
-
-
-
-
-  const { width } = Dimensions.get('window');
-
-  export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation }) {
 
     const [showNotification, setShowNotification] = useState(false);
     const [notifications, setNotifications] = useState([]);
@@ -40,11 +29,14 @@
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [network, setNetwork] = useState(null);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     // --- 2. FETCH DATA FROM BACKEND ---
-
-    const toggleNotifications = () => {
-    setShowNotification(prev => !prev);
+  
+  
+    const toggleNotifications = async () => {
+      await fetchNotifications(); // Fetch latest notifications before showing  
+      setShowNotification(prev => !prev);
 
   };
     const fetchWifiInfo = async () => {
@@ -53,7 +45,9 @@
         const res2 = await BackendApi.get('/network/wifiid');
         // res.data contains { ssid: "Name", ip: "...", etc }
         setWifiData(res.data);
+        console.log("Fetched Wi-Fi Info:", res.data);
         setWiifid(res2.data.id);
+        console.log("Fetched Wi-Fi ID:", res2.data.id);
       } catch (err) {
         console.log("Error fetching Home SSID:", err);
       } finally {
@@ -61,7 +55,29 @@
         setRefreshing(false);
       }
     };
-    const sendLocalNotification = async () => {
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await BackendApi.get('/notifications');
+        const allNotifications = res.data;
+
+        setNotifications(allNotifications);
+
+        const unread = allNotifications.filter(n => !n.is_read);
+        setUnreadCount(unread.length);
+
+        if (unread.length > 0) {
+          await sendLocalNotification(unread[0]);
+        }
+
+      } catch (err) {
+        console.log("Error fetching notifications:", err);
+      }
+    };
+
+
+
+    const sendLocalNotification = async (notif) => {
     try {
       const channelId = await notifee.createChannel({
         id: 'default',
@@ -70,8 +86,8 @@
       });
 
       await notifee.displayNotification({
-        title: 'Hello from App!',
-        body: 'This is a test local notification.',
+        title: notif.title,
+        body: notif.body ,
         android: {
           channelId,
           smallIcon: 'ic_launcher',
@@ -84,6 +100,34 @@
       console.log("Notification Error:", err);
     }
   };
+ const handleNotificationClick = async (notification) => {
+  try {
+    await BackendApi.post(`/notifications/mark-read/${notification.id}`);
+
+
+    // refresh notifications
+    await fetchNotifications();
+
+    // refresh unread count
+    const res = await BackendApi.get('/notifications/unread-count');
+    setUnreadCount(res.data.unread_count);
+
+    setShowNotification(false);
+
+    if (notification.type === "new_device") {
+      navigation.navigate("NetworkUsage");
+    } else if (notification.type === "alert") {
+      navigation.navigate("NetworkDetails");
+    } else {
+      navigation.navigate("Home");
+    }
+
+  } catch (err) {
+    console.log("Error handling notification:", err);
+  }
+};
+
+
 
     useEffect(() => {
     // ANDROID PERMISSION
@@ -121,6 +165,10 @@
 
     // INITIAL FETCH
     fetchWifiInfo();
+    fetchNotifications();
+    BackendApi.get('/notifications/unread-count')
+    .then(res => setUnreadCount(res.data.unread_count))
+    .catch(err => console.log("Error fetching unread count:", err));
 
     // CLEANUP
     return () => {
@@ -165,16 +213,26 @@
         {/* HEADER */}
       <View style={styles.container}>
         {/* HEADER */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={toggleNotifications}>
-            <View style={styles.notificationIcon}>
-              <MaterialCommunityIcons name="bell-outline" size={28} color="#fff" />
-            </View>
-          </TouchableOpacity>
-
-          <Text style={styles.greeting}>Network Monitor</Text>
-        </View>
-
+       {/* HEADER */}
+<View style={styles.header}>
+  <View>
+    <Text style={styles.greeting}>Network Monitor</Text>
+    <Text style={styles.subGreeting}>
+      {loading ? 'Checking status...' : 'System Secure'}
+    </Text>
+  </View>
+  
+  <TouchableOpacity onPress={toggleNotifications} style={styles.notificationIcon}>
+    <MaterialCommunityIcons name="bell-outline" size={26} color="#fff" />
+    {unreadCount > 0 && (
+      <View style={styles.countBadge}>
+        <Text style={styles.countText}>
+          {unreadCount > 9 ? '9+' : unreadCount}
+        </Text>
+      </View>
+    )}
+  </TouchableOpacity>
+</View>
         {/* Notification Popup */}
         <Modal
           isVisible={showNotification}
@@ -189,34 +247,35 @@
               <Text style={styles.noNotif}>No notifications available</Text>
             ) : (
               <ScrollView>
-                {notifications.map((item, index) => (
-                  <View key={index} style={styles.notifItem}>
-                    <Text style={styles.notifTitle}>{item.title}</Text>
-                    <Text style={styles.notifBody}>{item.body}</Text>
-                  </View>
-                ))}
+                {notifications.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[
+                    styles.notifItem,
+                    { backgroundColor: item.is_read ? "#1e293b" : "#334155" }
+                  ]}
+                  onPress={() => handleNotificationClick(item)}
+                >
+                  <Text style={styles.notifTitle}>{item.title}</Text>
+                  <Text style={styles.notifBody}>{item.message}</Text>
+                </TouchableOpacity>
+              ))}
+
               </ScrollView>
             )}
           </View>
         </Modal>
-
-
         {/* MAIN CONTENT */}
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <Text style={{ color: "#fff" }}>Your HomeScreen Content Here</Text>
         </View>
       </View>
-
-
-
         <ScrollView 
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#3b82f6"/>
           }
-        >
-
-      
+        >      
         {/* MAIN STATUS CARD */}
         <TouchableOpacity
           activeOpacity={0.9}
@@ -230,55 +289,7 @@
                 {getStatusText()}
               </Text>
             </View>
-          </View>
-
-     
-          {/* DISPLAY THE SMART SSID */}
-          {/* <Text style={styles.statusTitle}>{getSSID()}</Text> */}
-        {/* </TouchableOpacity>
-          <View style={styles.statusRow}>
-            <View style={styles.statusItem}>
-              <Text style={styles.statusLabel}>Type</Text>
-              <Text style={styles.statusValue}>
-                {network?.type?.toUpperCase() || '--'}
-              </Text>
-            </View>
-            <View style={styles.statusItem}>
-              <Text style={styles.statusLabel}>Internet</Text>
-              <Text style={styles.statusValue}>
-                {network?.isInternetReachable ? 'Reachable' : 'Unreachable'}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.statusItem}>
-            <Text style={styles.statusLabel}>Internet</Text>
-            <Text style={styles.statusValue}>
-              {network?.isInternetReachable ? 'Reachable' : 'Unreachable'}
-            </Text>
-          </View>
-        </View>
-        <View>
-          {/* TIP: Click to open Location Settings if needed */}
-          {/* {getSSID() === 'Unknown (Turn On GPS)' && (
-            <TouchableOpacity
-              style={{
-                marginTop: 15,
-                backgroundColor: 'rgba(0,0,0,0.2)',
-                padding: 10,
-                borderRadius: 8,
-                alignItems: 'center',
-              }}
-              onPress={() =>
-                Linking.sendIntent('android.settings.LOCATION_SOURCE_SETTINGS')
-              }
-            >
-              <Text style={{ color: '#fff', fontSize: 12 }}>
-                Tap to Open Location Settings
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View> */}
-
+          </View>    
          
    <Text style={styles.statusTitle} numberOfLines={1}>
             {getSSID()}
@@ -541,17 +552,60 @@ const styles = StyleSheet.create({
       color: '#fff',
       marginBottom: 4,
     },
+    notificationBadge: {
+      position: "absolute",
+      top: -5,
+      right: -5,
+      backgroundColor: "red",
+      borderRadius: 10,
+      minWidth: 18,
+      height: 18,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 4,
+      zIndex: 10,
+    },
 
-    
+    statusBadge: {
+      backgroundColor: '#fff',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 20,
+    },
+
     cardSubtitle: { 
       fontSize: 12, 
       color: "#94a3b8" 
     },
     notificationIcon: {
-      padding: 10,
-      borderRadius: 25,
-      backgroundColor: "#1e293b",
-    },
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: "#1e293b",
+    justifyContent: "center",
+    alignItems: "center",
+    position: 'relative', // Necessary for absolute positioning of the badge
+  },
+  countBadge: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "#ef4444", // Modern Red
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: "#1e293b", // Creates a "cut-out" effect against the icon background
+  },
+  countText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
     modalStyle: { margin: 0, justifyContent: "flex-start", paddingTop: 50 },
     modalContent: { backgroundColor: "#1e293b", marginHorizontal: 20, borderRadius: 12, padding: 15, maxHeight: 300 },
     noNotif: { color: "#94a3b8", textAlign: "center", fontSize: 16, paddingVertical: 20 },
@@ -559,5 +613,4 @@ const styles = StyleSheet.create({
     notifTitle: { color: "#fff", fontWeight: "bold" },
     notifBody: { color: "#94a3b8", marginTop: 2 },
   });
-
 

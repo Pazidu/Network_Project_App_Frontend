@@ -28,6 +28,7 @@ export default function NetworkUsage() {
       const res = await BackendApi.get('/network-usage/deviceUsage');
       const payload = res.data?.devices ? res.data : res.data?.data;
       setDevices(payload?.devices || []);
+      console.log('Fetched network usage:', payload);
     } catch (err) {
       console.error('Network usage fetch error:', err);
     } finally {
