@@ -13,7 +13,7 @@ import {
 import BackendApi from '../api/BackendApi';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // or '@expo/vector-icons'
 
-export default function NetworkUsage() {
+export default function NetworkUsage({navigation}) {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -28,6 +28,7 @@ export default function NetworkUsage() {
       const res = await BackendApi.get('/network-usage/deviceUsage');
       const payload = res.data?.devices ? res.data : res.data?.data;
       setDevices(payload?.devices || []);
+      console.log('Fetched network usage:', payload);
     } catch (err) {
       console.error('Network usage fetch error:', err);
     } finally {
@@ -155,6 +156,17 @@ export default function NetworkUsage() {
               <Text style={styles.label}>Sessions</Text>
               <Text style={styles.value}>{item.session_count}</Text>
             </View>
+            <TouchableOpacity
+                  style={styles.visitButton}
+                  onPress={() =>
+                    navigation.navigate('SiteVisits', {
+                      mac: item.mac,
+                      deviceName: item.device_name,
+                    })
+                  }
+                >
+  <Text style={styles.visitButtonText}>View Site Visits</Text>
+</TouchableOpacity>
           </View>
         )}
       </TouchableOpacity>
@@ -272,4 +284,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
+  visitButton: {
+  marginTop: 10,
+  backgroundColor: '#3b82f6',
+  paddingVertical: 12,
+  borderRadius: 10,
+  alignItems: 'center',
+},
+
+visitButtonText: {
+  color: '#fff',
+  fontWeight: 'bold',
+  fontSize: 14,
+},
 });
